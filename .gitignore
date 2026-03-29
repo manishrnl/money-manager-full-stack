@@ -1,4 +1,12 @@
+# Ignore environment secrets
 .env
 *.env
-.git
+
+# Ignore IDE and Build files
 .idea/
+target/
+node_modules/
+*.class
+
+# DO NOT put .git here. 
+# Git handles .git folders automatically.
