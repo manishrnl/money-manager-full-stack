@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,9 +43,9 @@ public class NotificationService {
         log.info("Job Ended: sendDailyExpenseReminder()");
     }
 
-    @Scheduled(cron = "0 38 21 * * *", zone = "IST")
+    @Scheduled(cron = "0 30 21 * * *", zone = "IST")
     public void sendDailyExpenseSummary() {
-        log.info("Job Started: sendDailyExpenseSummary() at 21:38 IST");
+        log.info("Job Started: sendDailyExpenseSummary() at 21:30 IST");
 
         List<ProfileEntity> profiles = profileRepository.findAll();
         LocalDate today = LocalDate.now();
@@ -56,6 +58,10 @@ public class NotificationService {
     }
 
     private String buildEmailSubjectWithTable(String name, List<ExpenseDto> expenses, LocalDate date) {
+        LocalTime currentTime = LocalTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");// Use "hh:mm a" for 12-hour format with AM/PM
+        String formattedTime = currentTime.format(formatter);
+
         StringBuilder tableRows = new StringBuilder();
         int serialNo = 1;
 
@@ -71,7 +77,7 @@ public class NotificationService {
                                 "<td style='padding: 10px;'>%s</td>" +
                                 "<td style='padding: 10px;'>%s</td>" +
                                 "</tr>",
-                        serialNo++, ex.getName(), ex.getCategoryName(), ex.getId(),
+                        serialNo++, ex.getName(), ex.getAmount(), ex.getCategoryName(),
                         date.toString()
                 ));
             }
@@ -88,7 +94,7 @@ public class NotificationService {
                 "    <tr>" +
                 "      <td style='padding: 30px; color: #333333; line-height: 1.6;'>" +
                 "        <h2 style='margin-top: 0;'>Hello, " + name + "! 👋</h2>" +
-                "        <p>It's 10:00 PM—time to review your logs. Here is what you've recorded so far:</p>" +
+                "        <p>It's " + formattedTime + " —time to review your logs. Here is what you've recorded so far:</p>" +
                 "        <table style='width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;'>" +
                 "          <thead>" +
                 "            <tr style='background-color: #f8f9fa; border-bottom: 2px solid #4CAF50; text-align: left;'>" +
@@ -118,6 +124,7 @@ public class NotificationService {
     }
 
     private String buildSummaryEmailForExpenseNotification(String name, List<ExpenseDto> expenses, LocalDate date) {
+
         StringBuilder tableRows = new StringBuilder();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
