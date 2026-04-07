@@ -1,9 +1,9 @@
 spring:
   application:
     name: money-manager
+  banner-mode: off
 
   datasource:
-    # Postgres specific driver and URL
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -11,14 +11,34 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${HIBERNATE_DDL_AUTO}
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         highlight_sql: true
         # Helps Hibernate optimize queries specifically for Postgres
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+
+
+#############################################
+# LOGGING SETTINGS (Colorful Console)
+#############################################
+# Enable ANSI colors
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Shows the values (?) being passed to SQL
+# Default log level
+  root: INFO
+# Custom log pattern (pretty + colorful)
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5p) %clr([%15.15t]){cyan} %clr(%-40.40logger{39}){magenta} : %clr(%m){green}%n"
+
+
 
   # --- MOVE THIS OUT OF JPA ---
 
@@ -47,6 +67,7 @@ spring:
             fromEmail: ${BREVO_FROM_EMAIL}
 
 server:
+  shutdown: immediate
   port: ${SERVER_PORT}
   servlet:
     context-path: /api/v1
@@ -54,6 +75,22 @@ jwt:
     secretKey: ${JWT_SECRET_KEY}
 
 money.manager.frontend.url: ${FRONT_END_URL}
-app.activation.url: ${BACKEND_URL}
+money.manager.backend.url: ${BACKEND_URL}
+
 brevo_api_key: ${BREVO_API_KEY}
 brevo_from_email: ${BREVO_FROM_EMAIL}
+
+SPRING_PROFILES_ACTIVE: {SPRING_PROFILES_ACTIVE}
+
+jwt.accessToken.expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+jwt.refreshToken.expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+
+# Redis Configuration
+spring.data.redis.host: ${SPRING_DATA_REDIS_HOST}
+spring.data.redis.port: ${SPRING_DATA_REDIS_PORT}
+
+# Enable Caching
+spring.cache.type: redis
+# Set default TTL for cache (optional, e.g., 10 minutes)
+# spring.cache.redis.time-to-live: 600000

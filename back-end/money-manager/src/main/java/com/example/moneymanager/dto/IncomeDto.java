@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 
-public class IncomeDto {
+public class IncomeDto implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String name;
     private String icon;

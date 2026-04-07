@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,10 +25,16 @@ public class EmailService {
 
     private final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
     private final RestTemplate restTemplate = new RestTemplate();
-
+    /**
+     * COMMENT: We use @Async instead of caching.
+     * Caching an email would stop it from being sent multiple times.
+     * @Async moves the API call to a background thread so the user doesn't
+     * have to wait for the Brevo API to respond.
+     */
+    @Async
     public void sendEmail(String toEmail, String subject, String htmlContent) {
         try {
-            log.info("Using API Key: {}", brevoApiKey);
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("api-key", brevoApiKey);
@@ -54,37 +61,3 @@ public class EmailService {
         }
     }
 }
-
-
-//
-//    private final JavaMailSender javaMailSender;
-//
-/// /    public EmailService(@Autowired(required = false) JavaMailSender javaMailSender) {
-/// /        this.javaMailSender = javaMailSender;
-/// /    }
-//
-//    @Value("${spring.mail.properties.mail.smtp.fromEmail}")
-//    private String fromEmail;
-//
-//    public void sendEmail(String toEmail, String subject, String body) {
-//        if (javaMailSender == null) {
-//            log.error("JavaMailSender is null. Check your spring.mail configuration in application.yml");
-//            throw new RuntimeException("Email configuration is missing or incorrect.");
-//        }
-//
-//        try {
-//            log.info("Attempting to send email to {}", toEmail);
-//            SimpleMailMessage message = new SimpleMailMessage();
-//            message.setFrom(fromEmail);
-//            message.setTo(toEmail);
-//            message.setSubject(subject);
-//            message.setText(body);
-//
-//            javaMailSender.send(message);
-//            log.info("Email sent successfully!");
-//        } catch (Exception ex) {
-//            log.error("SMTP Error: {}", ex.getMessage());
-//            throw new RuntimeException("Email sending failed: " + ex.getMessage());
-//        }
-//    }
-//}

@@ -12,4 +12,8 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     List<Session> findByUser(ProfileEntity user);
 
     Optional<Session> findByRefreshToken(String refreshToken);
+
+    List<Session> findByUserIdOrderByCreatedAtAsc(Long id);
+
+    boolean existsByRefreshToken(String refreshToken);
 }

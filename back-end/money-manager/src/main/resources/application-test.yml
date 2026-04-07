@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: money-manager
+
+  datasource:
+    # Postgres specific driver and URL
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+        # Helps Hibernate optimize queries specifically for Postgres
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+
+
+#############################################
+# LOGGING SETTINGS (Colorful Console)
+#############################################
+# Enable ANSI colors
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Shows the values (?) being passed to SQL
+# Default log level
+  root: INFO
+
+# Custom log pattern (pretty + colorful)
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%-5p) %clr([%15.15t]){cyan} %clr(%-40.40logger{39}){magenta} : %clr(%m){green}%n"
+
+
+
+
+  mail:
+      host: smtp-relay.brevo.com
+      port: 465
+      username: ${BREVO_USERNAME}
+      password: ${BREVO_PASSWORD}
+      properties:
+        mail:
+          debug: true
+          smtp:
+            auth: true
+            ssl:
+              enable: true
+              socketFactory:
+                port: 465
+                class: javax.net.ssl.SSLSocketFactory
+                fallback: false
+            connectiontimeout: 10000
+            timeout: 10000
+            writetimeout: 10000
+            starttls:
+              enable: true
+              required: true
+            fromEmail: ${BREVO_FROM_EMAIL}
+
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+jwt:
+    secretKey: ${JWT_SECRET_KEY}
+
+money.manager.frontend.url: http://localhost:5173
+money.manager.backend.url: http://localhost:8080
+brevo_api_key: ${BREVO_API_KEY}
+brevo_from_email: ${BREVO_FROM_EMAIL}
+
+
+# 10 Days in milliseconds (10 *  60 * 60 * 1000)
+jwt.accessToken.expiration: 6000000
+
+# 180 Days in milliseconds
+jwt.refreshToken.expiration: 15552000000
+
+
+# Redis Configuration
+spring.data.redis.host: localhost
+spring.data.redis.port: 6379
+
+# Enable Caching
+spring.cache.type: redis
+# Set default TTL for cache (optional, e.g., 10 minutes)
+# spring.cache.redis.time-to-live: 600000

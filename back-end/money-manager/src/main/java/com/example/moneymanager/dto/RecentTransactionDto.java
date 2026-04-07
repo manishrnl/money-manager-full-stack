@@ -1,10 +1,8 @@
 package com.example.moneymanager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,8 +11,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecentTransactionDto {
-
+@Getter
+@Setter
+public class RecentTransactionDto implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long profileId;
     private String icon;
@@ -24,4 +24,16 @@ public class RecentTransactionDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String type;
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        if (date == null) {
+            this.date = LocalDate.now();
+        } else {
+            this.date = date;
+        }
+    }
 }

@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
 
     List<IncomeEntity> findByProfileIdOrderByDateDesc(Long profileId);
 
-    List<IncomeEntity> findTop5ByProfileIdOrderByDateDesc(Long profileId);
 
     @Query("SELECT SUM (i.amount) FROM IncomeEntity i WHERE i.profile.id=:profileId")
     BigDecimal findTotalIncomePerProfileId(@Param("profileId") Long profileId);
@@ -31,7 +31,18 @@ public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
                                                                                 @Param("keyword") String keyword,
                                                                                 Sort sort);
 
-    List<IncomeEntity> findByProfileIdAndDateBetween(Long profileId, LocalDate startDate,
-                                                     LocalDate endDate);
+
+    List<IncomeEntity> findTop5ByProfileIdOrderByDateDesc(Long profileId);
+
+    @Query("SELECT i FROM IncomeEntity i WHERE i.profile.id = :profileId " +
+            "AND i.date >= CAST(:startDate AS date) " +
+            "AND i.date <= CAST(:endDate AS date) " +
+            "ORDER BY i.date DESC")
+    List<IncomeEntity> findByProfileIdAndDateBetween(
+            @Param("profileId") Long profileId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
 
 }

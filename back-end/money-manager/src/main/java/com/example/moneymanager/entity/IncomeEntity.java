@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -43,9 +44,9 @@ public class IncomeEntity {
 
     @PrePersist
     public void prePersist() {
-        if (this.date == null)
-            this.date = LocalDate.now();
-
+        if (this.date == null) {
+            this.date = LocalDate.now(ZoneId.of("Asia/Kolkata"));
+        }
     }
 
 }

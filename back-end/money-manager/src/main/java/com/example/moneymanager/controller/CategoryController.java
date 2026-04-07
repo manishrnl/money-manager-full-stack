@@ -4,6 +4,7 @@ import com.example.moneymanager.dto.CategoryDto;
 import com.example.moneymanager.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +30,18 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryDto> updateCategoriesForCurrentUser(@RequestBody CategoryDto categoryDto ,@PathVariable Long categoryId) {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategoriesForCurrentUser(categoryDto,categoryId));
+    public ResponseEntity<CategoryDto> updateCategoriesForCurrentUser(@RequestBody CategoryDto categoryDto, @PathVariable Long categoryId) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategoriesForCurrentUser(categoryDto, categoryId));
     }
 
     @GetMapping("/{type}")
     public ResponseEntity<List<CategoryDto>> getCategoryByTypeAndCurrentUser(@PathVariable String type) {
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategoryByTypeAndCurrentUser(type));
+    }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<String> deleteCategoryByIdAndProfileId(@PathVariable Long categoryId) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.deleteCategoryByIdAndProfileId(categoryId));
+
     }
 }

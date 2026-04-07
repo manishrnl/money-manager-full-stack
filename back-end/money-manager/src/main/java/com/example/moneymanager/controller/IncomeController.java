@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -30,14 +31,22 @@ public class IncomeController {
         return ResponseEntity.ok(incomeService.getIncomeForCurrentMonth());
     }
 
+    @GetMapping("/latest")
+    public ResponseEntity<List<IncomeDto>> getLatestIncomes() {
+        return ResponseEntity.ok(incomeService.getLatest5IncomesForCurrentUser());
+    }
+
+    @PutMapping("/{incomeId}")
+    public ResponseEntity updateIncomeById(@PathVariable Long incomeId,
+                                           @RequestBody IncomeDto incomeDto) {
+        incomeService.updateIncomeById(incomeId, incomeDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
     @DeleteMapping("/{incomeId}")
     public ResponseEntity<Void> deleteIncome(@PathVariable Long incomeId) {
         incomeService.deleteIncome(incomeId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/latest")
-    public ResponseEntity<List<IncomeDto>> getLatestIncomes() {
-        return ResponseEntity.ok(incomeService.getLatest5IncomesForCurrentUser());
     }
 }

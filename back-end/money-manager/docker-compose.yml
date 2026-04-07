@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: money-manager-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Manish@2009
+      POSTGRES_DB: money-manager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: money-manager-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  app:
+    build: .
+    container_name: money-manager-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+
+      # Local Docker Database
+      DB_URL: jdbc:postgresql://postgres:5432/money-manager
+      DB_USERNAME: postgres
+      DB_PASSWORD: Manish@2009
+
+      # Local Docker Redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      jwt.secretKey: ${JWT_SECRET_KEY}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_FROM_EMAIL: ${BREVO_FROM_EMAIL}
+      money.manager.frontend.url: http://localhost:5173
+
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

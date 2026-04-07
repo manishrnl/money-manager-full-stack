@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,6 +51,8 @@ public class ProfileEntity implements UserDetails {
     public void prePersist() {
         if (this.isActive == null)
             isActive = false;
+        if (this.roles == null)
+            roles = Collections.singleton(Role.USER);
     }
 
 

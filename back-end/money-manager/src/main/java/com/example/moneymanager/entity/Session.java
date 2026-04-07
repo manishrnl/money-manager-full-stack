@@ -24,5 +24,14 @@ public class Session {
     private LocalDateTime lastUsedAt;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private ProfileEntity user;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

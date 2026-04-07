@@ -30,8 +30,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         return httpSecurity.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/status",
-                                "/health","/profile/register", "/profile/login", "/profile/activate").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/status", "/health",
+                                "/profile/register", "/profile/login", "/profile/refresh/**",
+                                "/profile/activate").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilters, UsernamePasswordAuthenticationFilter.class)

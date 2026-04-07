@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -65,6 +66,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
         return new ResponseEntity<>(new ApiResponse<>(apiError), HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    public ResponseEntity<ApiResponse<?>> handleUnauthorizedException(HttpClientErrorException.Unauthorized exception) {
+        ApiError apiError = ApiError.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.UNAUTHORIZED)
+                .build();
+        return new ResponseEntity<>(new ApiResponse<>(apiError), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
     public ResponseEntity<ApiResponse<?>> handleInternalServerError(HttpServerErrorException.InternalServerError exception) {
@@ -109,27 +118,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(new ApiResponse<>(apiError), status);
     }
-
-
-////  To Handle Database Error
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponseEntity<ApiResponse<?>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-//        String message = "Database Constraint Violation";
-//
-//        // Extract the most specific cause (the actual SQL error message)
-//        if (ex.getRootCause() != null) {
-//            message = ex.getRootCause().getMessage();
-//        } else {
-//            message = ex.getMessage();
-//        }
-//
-//        ApiError apiError = ApiError.builder()
-//                .message(message)
-//                .status(HttpStatus.CONFLICT) // 409 is better for duplicates, or use INTERNAL_SERVER_ERROR if preferred
-//                .build();
-//
-//        return new ResponseEntity<>(new ApiResponse<>(apiError), HttpStatus.CONFLICT);
-//    }
 
     private ResponseEntity<ApiResponse<?>> buildErrorResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(new ApiResponse<>(apiError), apiError.getStatus());

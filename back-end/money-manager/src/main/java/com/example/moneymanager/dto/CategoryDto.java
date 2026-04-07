@@ -1,7 +1,8 @@
 package com.example.moneymanager.dto;
 
-import com.example.moneymanager.entity.ProfileEntity;
 import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -9,14 +10,16 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 
-public class CategoryDto {
+public class CategoryDto implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String name;
 
     private String type;
     private String icon;
-    private ProfileEntity profile;
+
+    private Long profileId;
 
 
 }

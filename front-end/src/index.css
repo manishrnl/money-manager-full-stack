@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+:root {
+    --background: #afb8bf;
+}
+
+body, html {
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Ensure body takes full height */
+    width: 100%;
+    overflow: hidden; /* Prevent accidental scrolling while logging in */
+}
+
+/* Optional: Make the background color a fallback in case image fails to load */
+/*body {*/
+/*    background-color: var(--background);*/
+/*}*/
+
+/*For Animation while fetching data from server */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
