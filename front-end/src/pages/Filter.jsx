@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useState} from "react";
 import Dashboards from "../components/Dashboards.jsx";
+import PremiumLoader from "../hooks/PremiumLoader.jsx";
 import {
     Bar,
     BarChart,
@@ -147,6 +148,10 @@ const Filter = () => {
     const totalIncome = transactions.filter(t => t.type === 'INCOME').reduce((s, i) => s + i.amount, 0);
     const totalExpense = transactions.filter(t => t.type === 'EXPENSE').reduce((s, i) => s + i.amount, 0);
 
+
+    if (loading) {
+        return <PremiumLoader isDone={loading} />;
+    }
     return (
         <Dashboards activeMenu="Filters">
             <div className="flex flex-col lg:flex-row min-h-screen bg-[#f9fafb]">

@@ -1,7 +1,6 @@
 spring:
   application:
     name: money-manager
-  banner-mode: off
 
   datasource:
     driver-class-name: org.postgresql.Driver

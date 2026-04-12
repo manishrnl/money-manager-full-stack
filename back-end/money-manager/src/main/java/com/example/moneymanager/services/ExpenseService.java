@@ -8,6 +8,7 @@ import com.example.moneymanager.exceptions.ResourceNotFoundException;
 import com.example.moneymanager.repository.CategoryRepository;
 import com.example.moneymanager.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,8 +19,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
@@ -30,6 +33,7 @@ public class ExpenseService {
 
 
     private static final String CACHE_NAME = "expenses";
+
     @Caching(evict = {
             @CacheEvict(cacheNames = CACHE_NAME, allEntries = true),
             @CacheEvict(cacheNames = DashboardService.DASHBOARD_CACHE, key = "#root.target.getCurrentUserId()")
@@ -90,7 +94,6 @@ public class ExpenseService {
     }
 
 
-
     @Cacheable(cacheNames = CACHE_NAME, key = "#root.target.getCurrentUserId() + '_latest'")
         /* COMMENT: The dashboard 'Recent Activity' usually calls this.
            Caching it makes the landing page feel much faster. */
@@ -147,6 +150,48 @@ public class ExpenseService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CACHE_NAME, allEntries = true),
+            @CacheEvict(cacheNames = DashboardService.DASHBOARD_CACHE, key = "#root.target.getCurrentUserId()")
+    })
+    public String updateExpenseById(Long expenseId, ExpenseDto expenseDto) {
+        log.info("Initiating updating Expense By ID : {}", expenseId);
+        ProfileEntity currentUser = profileService.getCurrentProfile();
+        Long profileId = currentUser.getId();
+        Optional<ExpenseEntity> currentExpense = Optional.ofNullable(expenseRepository.findByIdAndProfileId(expenseId,
+                profileId).orElseThrow(() -> new ResourceNotFoundException("Expenses " +
+                "not found with id : " + expenseId)));
+        log.info("ExpenseId : {} Profile Id : {} expenseDto : {}  ",
+                expenseId, profileId, expenseDto.toString());
+        if (currentExpense.equals(null)) {
+            log.info("Expense fetched from Repository is null");
+            throw new RuntimeException("Expenses Not found");
+        }
+        if (!expenseId.equals(currentExpense.get().getId())) {
+            log.info("Id not Matched");
+            throw new RuntimeException("Id Not matched with our database");
+        }
+
+        ExpenseEntity updated = new ExpenseEntity();
+        updated.setId(expenseId);
+        updated.setProfile(currentUser);
+        updated.setIcon(expenseDto.getIcon());
+        updated.setName(expenseDto.getName());
+        updated.setAmount(expenseDto.getAmount());
+
+        updated.setDate(expenseDto.getDate());
+
+        CategoryEntity categoryEntity =
+                categoryRepository.findByIdAndProfileId(expenseDto.getCategoryId(),
+                        profileId);
+        log.info("Category Id: {}", categoryEntity.getId());
+        updated.setCategory(categoryEntity);
+
+        log.info("All operation were successfully completed .... ");
+        expenseRepository.save(updated);
+        return "Updation Complete";
     }
 
     public Long getCurrentUserId() {

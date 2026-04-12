@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +35,15 @@ public class ExpenseController {
         expenseService.deleteExpense(expenseId);
         return ResponseEntity.noContent().build(); // 204 No Content is better for deletes
     }
+
+    @PutMapping("/{expenseId}")
+    public ResponseEntity<String> updateExpenseById(@PathVariable Long expenseId,
+                                            @RequestBody ExpenseDto expenseDto) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenseService.updateExpenseById(expenseId, expenseDto));
+
+    }
+
 
     @GetMapping("/latest")
     public ResponseEntity<List<ExpenseDto>> getLatestExpenses() {

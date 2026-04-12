@@ -1,13 +1,14 @@
 import Dashboards from "../components/Dashboards.jsx";
 import useUser from "../hooks/UseUser.jsx";
-import {Plus, Trash2} from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import CategoryList from "../components/lists/CategoryList.jsx";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axiosConfig from "../util/AxiosConfig.jsx";
-import {API_ENDPOINTS} from "../util/API_ENDPOINTS.js";
+import { API_ENDPOINTS } from "../util/API_ENDPOINTS.js";
 import toast from "react-hot-toast";
 import Modals from "../components/Modals.jsx";
 import AddCategoryForm from "../components/forms/AddCategoryForm.jsx";
+import PremiumLoader from "../hooks/PremiumLoader.jsx";
 
 const Category = () => {
     useUser();
@@ -26,17 +27,21 @@ const Category = () => {
     const fetchCategoryDetails = async () => {
         setLoading(true);
         try {
-            const response = await axiosConfig.get(API_ENDPOINTS.GET_ALL_CATEGORY);
+            const response = await axiosConfig.get(
+                API_ENDPOINTS.GET_ALL_CATEGORY,
+            );
             console.log("Full Axios Object:", response);
             console.log("Just the JSON body:", response.data);
             // Your JSON structure has the list inside response.data.data
             if (response.data && response.data.data) {
-                console.log('Categories fetched:', response.data.data);
+                console.log("Categories fetched:", response.data.data);
                 setCategoryData(response.data.data);
             }
         } catch (error) {
             console.error("Error encountered: ", error);
-            toast.error(error.response?.data?.message || "Failed to fetch categories");
+            toast.error(
+                error.response?.data?.message || "Failed to fetch categories",
+            );
         } finally {
             setLoading(false);
         }
@@ -44,22 +49,21 @@ const Category = () => {
 
     useEffect(() => {
         document.title = "Category - Money Manager";
-        window.scrollTo({top: 0, behavior: "smooth"});
+        window.scrollTo({ top: 0, behavior: "smooth" });
         fetchCategoryDetails();
     }, []); // Add empty dependency array to prevent infinite loop
 
     const handleEditCategory = (categoryToEdit) => {
         setSelectedCategory(categoryToEdit); // Populates data to be edited  into the Editor
-        setOpenEditCategoryModal(true);  //     Display modals
-    }
+        setOpenEditCategoryModal(true); //     Display modals
+    };
     const handleUpdateCategory = async (updatedCategory) => {
-        const {id, name, icon, type} = updatedCategory;
+        const { id, name, icon, type } = updatedCategory;
 
-        console.log("Updating category", updatedCategory)
+        console.log("Updating category", updatedCategory);
         if (!name) {
-            toast.error("Category name is required")
+            toast.error("Category name is required");
             return;
-
         }
         if (!id) {
             toast.error("Category id is missing .");
@@ -70,17 +74,18 @@ const Category = () => {
             await axiosConfig.put(API_ENDPOINTS.UPDATE_CATEGORY(id), {
                 name,
                 icon,
-                type
+                type,
             });
             setOpenEditCategoryModal(false);
-            setSelectedCategory(null)
-            toast.success("Category Updated Successfully")
+            setSelectedCategory(null);
+            toast.success("Category Updated Successfully");
             fetchCategoryDetails();
-
         } catch (error) {
-            toast.error(error.response?.data?.message || "Something went wrong")
+            toast.error(
+                error.response?.data?.message || "Something went wrong",
+            );
         }
-    }
+    };
     const handleConfirmDelete = (category) => {
         setCategoryToDelete(category);
         setOpenDeleteModal(true);
@@ -90,7 +95,9 @@ const Category = () => {
 
         setLoading(true);
         try {
-            await axiosConfig.delete(API_ENDPOINTS.DELETE_CATEGORY(categoryToDelete.id));
+            await axiosConfig.delete(
+                API_ENDPOINTS.DELETE_CATEGORY(categoryToDelete.id),
+            );
             toast.success("Category deleted successfully");
             setOpenDeleteModal(false);
             setCategoryToDelete(null);
@@ -103,7 +110,7 @@ const Category = () => {
     };
 
     const handleAddCategory = async (category) => {
-        const {name, type, icon} = category;
+        const { name, type, icon } = category;
 
         if (!name.trim()) {
             toast.error("Category Name is Required");
@@ -111,18 +118,26 @@ const Category = () => {
         }
         //  check if category already exists skips db call then
         const isDuplicate = categoryData.some((category) => {
-            return (category.name.toLowerCase() === name.trim().toLowerCase() && category.type === type);
-        })
+            return (
+                category.name.toLowerCase() === name.trim().toLowerCase() &&
+                category.type === type
+            );
+        });
         if (isDuplicate) {
-            toast.error(`Category Name ${category.name} and Type ${category.type} Already exists . Can't add Duplicate`)
+            toast.error(
+                `Category Name ${category.name} and Type ${category.type} Already exists . Can't add Duplicate`,
+            );
             return;
         }
         try {
-            const response = await axiosConfig.post(API_ENDPOINTS.SAVE_CATEGORY, {
-                name,
-                type,
-                icon
-            });
+            const response = await axiosConfig.post(
+                API_ENDPOINTS.SAVE_CATEGORY,
+                {
+                    name,
+                    type,
+                    icon,
+                },
+            );
 
             // Check for BOTH 200 and 201 to be safe
             if (response.status === 201 || response.status === 200) {
@@ -132,21 +147,30 @@ const Category = () => {
                 // Refresh the list so the new category appears immediately
                 fetchCategoryDetails();
             }
-
         } catch (error) {
-
-
-            console.error("Error Adding Category:", error.response?.data || error.message);
+            console.error(
+                "Error Adding Category:",
+                error.response?.data || error.message,
+            );
 
             // Specific error handling for Auth vs Validation
-            if (error.response?.status === 401 || error.response?.status === 403) {
+            if (
+                error.response?.status === 401 ||
+                error.response?.status === 403
+            ) {
                 toast.error("Session expired. Please login again.");
-
             } else {
-                toast.error(error.response?.data?.message || "Failed to add Category");
+                toast.error(
+                    error.response?.data?.message || "Failed to add Category",
+                );
             }
         }
     };
+
+    if (loading) {
+        return <PremiumLoader isDone={loading} />;
+    }
+
     return (
         <Dashboards activeMenu="Category">
             <div className="my-5 mx-auto">
@@ -156,7 +180,7 @@ const Category = () => {
                         onClick={() => setOpenAddCategoryModal(true)}
                         className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-md hover:bg-emerald-700 transition-transform active:scale-95"
                     >
-                        <Plus size={15}/>
+                        <Plus size={15} />
                         Add Category
                     </button>
                 </div>
@@ -173,15 +197,16 @@ const Category = () => {
                 <Modals
                     isOpen={openAddCategoryModal}
                     onClose={() => setOpenAddCategoryModal(false)}
-                    title="Add Category">
-                    <AddCategoryForm onAddCategory={handleAddCategory}/>
+                    title="Add Category"
+                >
+                    <AddCategoryForm onAddCategory={handleAddCategory} />
                 </Modals>
 
                 <Modals
                     isOpen={openEditCategoryModal}
                     onClose={() => {
-                        setOpenEditCategoryModal(false)
-                        setSelectedCategory(null)
+                        setOpenEditCategoryModal(false);
+                        setSelectedCategory(null);
                     }}
                     title="Update Category"
                 >
@@ -199,14 +224,16 @@ const Category = () => {
                     title="Delete Category"
                 >
                     <div className="p-6 text-center">
-                        <div
-                            className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Trash2 size={32}/>
+                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Trash2 size={32} />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Are you sure?</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">
+                            Are you sure?
+                        </h3>
                         <p className="text-gray-500 mb-8">
-                            Do you really want to delete <b>{categoryToDelete?.name}</b>?
-                            This action cannot be undone.
+                            Do you really want to delete{" "}
+                            <b>{categoryToDelete?.name}</b>? This action cannot
+                            be undone.
                         </p>
                         <div className="flex gap-3">
                             <button

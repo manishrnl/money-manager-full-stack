@@ -14,9 +14,12 @@ const PageNotFound = () => {
 
                 {/* Text Content */}
                 <h1 className="text-9xl font-black text-slate-200">404</h1>
-                <h2 className="text-3xl font-bold text-slate-900 mt-[-40px]">Lost in Space?</h2>
+                <h2 className="text-3xl font-bold text-slate-900 mt-[-40px]">
+                    Lost in Space?
+                </h2>
                 <p className="text-slate-600 mt-4 mb-8">
-                    The page you're looking for doesn't exist or has been moved to a different vault.
+                    The page you're looking for doesn't exist or has been moved
+                    to a different vault.
                 </p>
 
                 {/* Action Button */}
@@ -30,7 +33,13 @@ const PageNotFound = () => {
 
                 <div className="mt-10">
                     <p className="text-sm text-slate-400">
-                        Need help? <Link to="/login" className="text-violet-600 hover:underline">Sign in again</Link>
+                        Need help?{" "}
+                        <Link
+                            to="/login"
+                            className="text-violet-600 hover:underline"
+                        >
+                            Sign in again
+                        </Link>
                     </p>
                 </div>
             </div>
